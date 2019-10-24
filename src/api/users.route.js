@@ -3,7 +3,7 @@ import usersCtrl from "./users.controller"
 import commentsCtrl from "./comments.controller"
 
 const router = new Router()
-signup
+
 // associate put, delete, and get(id)
 router.route("/register").post(usersCtrl.register)
 router.route("/login").post(usersCtrl.login)

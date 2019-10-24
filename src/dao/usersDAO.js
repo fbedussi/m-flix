@@ -15,23 +15,6 @@ export default class UsersDAO {
   }
 
   /**
-  Ticket: User Management
-
-  For this ticket, you will need to implement the following five methods:
-
-  - getUser
-  - addUser
-  - loginUser
-  - logoutUser
-  - getUserSession
-
-  You can find these methods below this comment. Make sure to read the comments
-  in each method to better understand the implementation.
-
-  The method deleteUser is already given to you.
-  */
-
-  /**
    * Finds a user in the `users` collection
    * @param {string} email - The email of the desired user
    * @returns {Object | null} Returns either a single user or nothing
@@ -48,19 +31,17 @@ export default class UsersDAO {
    * @returns {DAOResponse} Returns either a "success" or an "error" Object
    */
   static async addUser(userInfo) {
-    /**
-    Ticket: Durable Writes
-
-    Please increase the durability of this method by using a non-default write
-    concern with ``insertOne``.
-    */
-
     try {
-      // TODO Ticket: User Management
-      // Insert a user with the "name", "email", and "password" fields.
-      // TODO Ticket: Durable Writes
-      // Use a more durable Write Concern for this operation.
-      const result = await users.insertOne({name: userInfo.name, email: userInfo.email, password: userInfo.password})
+      const result = await users.insertOne(
+        {
+          name: userInfo.name,
+          email: userInfo.email,
+          password: userInfo.password,
+        },
+        {
+          w: "majority",
+        },
+      )
       return { success: result.result.ok === 1 }
     } catch (e) {
       if (String(e).startsWith("MongoError: E11000 duplicate key error")) {
@@ -85,7 +66,7 @@ export default class UsersDAO {
       const result = await sessions.updateOne(
         { user_id: email },
         { $set: { jwt: jwt } },
-        { upsert: true }
+        { upsert: true },
       )
       return { success: result.result.ok === 1 }
     } catch (e) {
@@ -170,8 +151,8 @@ export default class UsersDAO {
       // TODO Ticket: User Preferences
       // Use the data in "preferences" to update the user's preferences.
       const updateResponse = await users.updateOne(
-        { someField: someValue },
-        { $set: { someOtherField: someOtherValue } },
+        { email },
+        { $set: { preferences } },
       )
 
       if (updateResponse.matchedCount === 0) {
